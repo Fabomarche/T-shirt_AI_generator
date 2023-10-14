@@ -11,12 +11,15 @@ const Home = () => {
         <AnimatePresence>
             {snap.intro && (
                 <motion.section className="home" {...slideAnimation('left')}>
-                    <motion.header {...slideAnimation("down")}>
+                    <motion.header {...slideAnimation("down")} className="flex justify-between items-center w-full">
                         <img
                             src='./threejs.png'
                             alt="logo"
                             className="w-8 h-8 object-contain"
                         />
+                        <p className="max-w-md font-normal text-gray-600 text-xs">
+                            Powered by <strong><a href="https://www.linkedin.com/in/fabricio-marchetti" target='_blank'>Fabricio Marchetti</a></strong>
+                        </p>
                     </motion.header>
                     <motion.div className="home-content" {...headContainerAnimation}>
                         <motion.div {...headTextAnimation}>
