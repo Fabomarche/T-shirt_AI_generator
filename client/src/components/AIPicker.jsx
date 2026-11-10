@@ -1,8 +1,6 @@
-import React from 'react'
-
 import CustomButton from './CustomButton'
 
-const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit }) => {
+const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit, error }) => {
     return (
         <div className='aipicker-container'>
             <textarea
@@ -12,6 +10,9 @@ const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit }) => {
                 onChange={e => setPrompt(e.target.value)}
                 className='aipicker-textarea'
             />
+            {error ? (
+                <p className='aipicker-error' role='alert'>{error}</p>
+            ) : null}
             <div className='flex flex-wrap gap-3'>
                 {generatingImg ? (
                     <CustomButton
