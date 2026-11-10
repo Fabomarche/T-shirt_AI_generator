@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSnapshot } from 'valtio'
 
@@ -16,6 +16,7 @@ const Customizer = () => {
     const [file, setFile] = useState('')
     const [prompt, setPrompt] = useState('')
     const [generatingImg, setGeneratingImg] = useState(false)
+    const [aiError, setAiError] = useState('')
 
     const [activeEditorTab, setActiveEditorTab] = useState("")
     const [activeFilterTab, setActiveFilterTab] = useState({
@@ -36,9 +37,13 @@ const Customizer = () => {
             case 'aipicker':
                 return <AIPicker
                     prompt={prompt}
-                    setPrompt={setPrompt}
+                    setPrompt={(value) => {
+                        setPrompt(value)
+                        if (aiError) setAiError('')
+                    }}
                     generatingImg={generatingImg}
                     handleSubmit={handleSubmit}
+                    error={aiError}
                 />
             default:
                 return null
@@ -46,9 +51,22 @@ const Customizer = () => {
     }
 
     const handleSubmit = async type => {
-        if (!prompt) return alert('Please enter a prompt')
+        const trimmedPrompt = prompt.trim()
+        if (!trimmedPrompt) {
+            setAiError('Please enter a prompt.')
+            return
+        }
+
+        if (!config.production.backendUrl) {
+            setAiError('The image service is not configured.')
+            return
+        }
+
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 90000)
 
         try {
+            setAiError('')
             setGeneratingImg(true)
             const response = await fetch(config.production.backendUrl, {
                 method: 'POST',
@@ -56,19 +74,39 @@ const Customizer = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    prompt,
-                })
+                    prompt: trimmedPrompt,
+                }),
+                signal: controller.signal,
             })
 
-            const data = await response.json()
+            let data = {}
+            try {
+                data = await response.json()
+            } catch {
+                setAiError('The server returned an unexpected response.')
+                return
+            }
 
-            handleDecals(type, `data:image/png;base64,${data.photo}`)
+            const photo = typeof data.photo === 'string' ? data.photo.trim() : ''
+            if (!response.ok || !photo) {
+                setAiError(typeof data.message === 'string' && data.message
+                    ? data.message
+                    : 'Could not generate an image. Try again.')
+                return
+            }
 
-        } catch (error) {
-            alert(error)
-        } finally {
-            setGeneratingImg(false)
+            handleDecals(type, `data:image/png;base64,${photo}`)
             setActiveEditorTab('')
+        } catch (error) {
+            if (error?.name === 'AbortError') {
+                setAiError('The image service took too long. Try again.')
+                return
+            }
+
+            setAiError('Could not reach the server. Try again.')
+        } finally {
+            clearTimeout(timeoutId)
+            setGeneratingImg(false)
         }
     }
 

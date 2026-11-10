@@ -48,7 +48,11 @@ html {
 }
 
 .aipicker-textarea {
-  @apply w-full bg-transparent text-sm border border-gray-300 p-2 outline-none flex-1;
+  @apply w-full bg-transparent text-sm border border-gray-300 p-2 outline-none flex-1 min-h-0;
+}
+
+.aipicker-error {
+  @apply text-[11px] leading-tight text-red-800 shrink-0 max-h-16 overflow-y-auto;
 }
 
 .filepicker-container {

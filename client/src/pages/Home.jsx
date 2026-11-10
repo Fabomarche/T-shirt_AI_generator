@@ -18,13 +18,13 @@ const Home = () => {
                             className="w-8 h-8 object-contain"
                         />
                         <p className="max-w-md font-normal text-gray-600 text-xs">
-                            Powered by <strong><a href="https://www.linkedin.com/in/fabricio-marchetti" target='_blank'>Fabricio Marchetti</a></strong>
+                            Powered by <strong><a href="https://www.linkedin.com/in/fabricio-marchetti" target="_blank" rel="noreferrer">Fabricio Marchetti</a></strong>
                         </p>
                     </motion.header>
                     <motion.div className="home-content" {...headContainerAnimation}>
                         <motion.div {...headTextAnimation}>
                             <h1 className="head-text">
-                                LET'S <br className="xl:block hidden" /> DO IT.
+                                LET&apos;S <br className="xl:block hidden" /> DO IT.
                             </h1>
                         </motion.div>
                         <motion.div {...headContentAnimation} className="flex flex-col gap-5">
